@@ -6,14 +6,12 @@ const Context = createContext();
 let getCart;
 
 if (typeof window !== 'undefined') {
-    console.log('You are on the browser');
+    console.log('You are on the browser!');
   
     getCart = localStorage.getItem('items') !== 'undefined' ? JSON.parse(localStorage.getItem('items')) : localStorage.clear();
-    console.log(getCart);
     // 👉️ can use localStorage here
   } else {
-    console.log('You are on the server');
-    console.log(getCart);
+    console.log('You are on the server!');
     // 👉️ can't use localStorage
   }
 
@@ -28,8 +26,8 @@ export const StateContext = ({ children }) => {
     let index;
     
     useEffect(() => {
-        getCart = localStorage.setItem('items', JSON.stringify({cartItems, totalPrice, totalQuantities }));
-    }, [getCart]);
+        localStorage.setItem('items', JSON.stringify({cartItems, totalPrice, totalQuantities }));
+    }, [cartItems, totalPrice, totalQuantities]);
     
 
     const onAdd = (product, quantity) => {
@@ -65,6 +63,8 @@ export const StateContext = ({ children }) => {
         setTotalPrice((prevTotalPrice) => prevTotalPrice - foundProduct.price * foundProduct.quantity);
         setTotalQuantities((prevTotalQuantities) => prevTotalQuantities - foundProduct.quantity);
         setCartItems(newCartItems);
+
+        localStorage.removeItem("items");
         
     }
 
