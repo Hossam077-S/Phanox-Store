@@ -4,32 +4,32 @@ import { toast } from 'react-hot-toast';
 const Context = createContext();
 
 let getCart;
+
 if (typeof window !== 'undefined') {
-  console.log('You are on the browser');
-
-  //getCartItems = localStorage.getItem('items') !== 'undefined' ? JSON.parse(localStorage.getItem('items')) : localStorage.clear();
-
-  getCart = JSON.parse(localStorage.getItem('items')) || [];
+    console.log('You are on the browser');
   
-  // 👉️ can use localStorage here
-} else {
-  console.log('You are on the server')
-  // 👉️ can't use localStorage
-}
+    getCart = localStorage.getItem('items') !== 'undefined' ? JSON.parse(localStorage.getItem('items')) : localStorage.clear();
+    console.log(getCart);
+    // 👉️ can use localStorage here
+  } else {
+    console.log('You are on the server');
+    console.log(getCart);
+    // 👉️ can't use localStorage
+  }
 
 export const StateContext = ({ children }) => {
     const [showCart, setShowCart] = useState(false);
-    const [cartItems, setCartItems] = useState(getCart?.cartItems);
-    const [totalPrice, setTotalPrice] = useState(getCart?.totalPrice);
-    const [totalQuantities, setTotalQuantities] = useState(getCart?.totalQuantities);
-    const [qty, setQty] = useState(getCart?.qty);
+    const [cartItems, setCartItems] = useState(getCart?.cartItems || [] );
+    const [totalPrice, setTotalPrice] = useState(getCart?.totalPrice || 0);
+    const [totalQuantities, setTotalQuantities] = useState(getCart?.totalQuantities || 0);
+    const [qty, setQty] = useState(1);
     
     let foundProduct;
     let index;
     
     useEffect(() => {
-        localStorage.setItem('items', JSON.stringify({cartItems, totalPrice, totalQuantities, qty }));
-    }, [cartItems]);
+        getCart = localStorage.setItem('items', JSON.stringify({cartItems, totalPrice, totalQuantities }));
+    }, [getCart]);
     
 
     const onAdd = (product, quantity) => {
@@ -72,8 +72,6 @@ export const StateContext = ({ children }) => {
         foundProduct = cartItems.find((item) => item._id === id);
         index = cartItems.findIndex((product) => product._id === id);
         const newCartItems = cartItems.filter((item) => item._id !== id)
-
-        console.log(foundProduct);
 
         if(value === 'inc') {
             setCartItems([ ...newCartItems, { ...foundProduct, quantity: foundProduct.quantity + 1 } ]);
